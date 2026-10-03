@@ -1,0 +1,23 @@
+flowchart TD
+    A([Start]) --> B[User Login]
+    B --> C[Authentication & JWT Validation]
+    C --> D[Open Dashboard]
+    D --> E[Configure SLA Rules / Thresholds]
+    E --> F[Start Monitoring Cycle]
+    F --> G[Collect Metrics from Services]
+    G --> H[Resource Monitoring Agent]
+    H --> I[Response Time Agent]
+    I --> J[SLA Verification Agent]
+    J --> K{Is SLA Violated?}
+
+    K -- Yes --> L[Alert Agent]
+    L --> M[Recommendation Agent]
+    M --> N[Generate Report]
+    N --> O[Store Results in SQLite]
+    O --> P[Dashboard Update]
+    P --> Q[Continue Monitoring]
+    Q --> F
+
+    K -- No --> Q
+
+    Q --> R([End])

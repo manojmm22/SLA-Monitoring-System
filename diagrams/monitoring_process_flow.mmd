@@ -1,0 +1,30 @@
+flowchart TD
+    A[Service] --> B[Monitoring Scheduler]
+    B --> C[CPU Collection]
+    B --> D[Memory Collection]
+    B --> E[Response Time Collection]
+    C --> F[SLA Verification]
+    D --> F
+    E --> F
+    F --> G[Violation Check]
+    G -- Yes --> H[Alert Generation]
+    G -- No --> I[Continue Monitoring]
+    H --> J[Recommendation Generation]
+    J --> K[Report Generation]
+    K --> L[(Database)]
+    L --> M[Dashboard]
+    I --> B
+    H --> L
+    J --> L
+    K --> L
+    L --> M
+
+    classDef service fill:#2563eb,stroke:#93c5fd,color:#f8fafc,stroke-width:1.2px;
+    classDef process fill:#7c3aed,stroke:#c4b5fd,color:#f8fafc,stroke-width:1.2px;
+    classDef data fill:#b45309,stroke:#f59e0b,color:#f8fafc,stroke-width:1.2px;
+    classDef dashboard fill:#0f766e,stroke:#5eead4,color:#f8fafc,stroke-width:1.2px;
+
+    class A service;
+    class B,C,D,E,F,G,H,J,K,I process;
+    class L data;
+    class M dashboard;

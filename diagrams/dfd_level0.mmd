@@ -1,0 +1,27 @@
+flowchart LR
+    Admin[Administrator] -->|Login / Manage| P1[Authentication]
+    User[User] -->|Login / View Dashboard| P1
+
+    P1 -->|User data / tokens| DS[(SQLite Database)]
+
+    P1 -->|Authenticated requests| P2[Monitoring]
+    P2 -->|Service metrics / logs| DS
+
+    P2 -->|Threshold comparison| P3[SLA Verification]
+    P3 -->|Violation result| P4[Alert Generation]
+    P4 -->|Alerts / notifications| DS
+
+    P2 -->|Monitoring summaries| P5[Reporting]
+    P5 -->|Generated reports| DS
+
+    P4 -->|Alert status| Admin
+    P5 -->|Reports / analytics| User
+    P3 -->|Compliance status| User
+
+    classDef external fill:#1d4ed8,stroke:#93c5fd,color:#f8fafc,stroke-width:1.2px;
+    classDef process fill:#7c3aed,stroke:#c4b5fd,color:#f8fafc,stroke-width:1.2px;
+    classDef store fill:#b45309,stroke:#f59e0b,color:#f8fafc,stroke-width:1.2px;
+
+    class Admin,User external;
+    class P1,P2,P3,P4,P5 process;
+    class DS store;

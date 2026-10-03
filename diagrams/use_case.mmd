@@ -1,0 +1,37 @@
+graph TD
+    Admin[Administrator] --> UC1[Login]
+    Admin --> UC2[Manage Users]
+    Admin --> UC3[Configure SLA]
+    Admin --> UC4[Monitor Services]
+    Admin --> UC5[View Alerts]
+    Admin --> UC6[Generate Reports]
+    Admin --> UC7[Logout]
+
+    User[User] --> UC8[Login]
+    User --> UC9[Dashboard]
+    User --> UC10[View SLA]
+    User --> UC11[View Reports]
+    User --> UC12[Profile]
+    User --> UC13[Logout]
+
+    UC1 --> Sys[SLA Monitoring System]
+    UC2 --> Sys
+    UC3 --> Sys
+    UC4 --> Sys
+    UC5 --> Sys
+    UC6 --> Sys
+    UC7 --> Sys
+    UC8 --> Sys
+    UC9 --> Sys
+    UC10 --> Sys
+    UC11 --> Sys
+    UC12 --> Sys
+    UC13 --> Sys
+
+    classDef actor fill:#1d4ed8,stroke:#93c5fd,color:#f8fafc,stroke-width:1.2px;
+    classDef usecase fill:#7c3aed,stroke:#c4b5fd,color:#f8fafc,stroke-width:1.2px;
+    classDef system fill:#0f766e,stroke:#5eead4,color:#f8fafc,stroke-width:1.2px;
+
+    class Admin,User actor;
+    class UC1,UC2,UC3,UC4,UC5,UC6,UC7,UC8,UC9,UC10,UC11,UC12,UC13 usecase;
+    class Sys system;

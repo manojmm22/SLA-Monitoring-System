@@ -1,0 +1,100 @@
+flowchart TB
+    U[User] --> B[Browser]
+    B --> F[Frontend<br/>React + TypeScript + MUI + Vite]
+    F --> API[Flask Backend<br/>Blueprint-based REST API]
+
+    subgraph Auth[Authentication & Access Layer]
+        A1[Authentication Module<br/>JWT Login / Refresh / User Session]
+        A2[Authorization & RBAC<br/>Roles / Permissions]
+    end
+
+    subgraph Core[Application Modules]
+        D[Dashboard Module<br/>Analytics & KPI Views]
+        M[Monitoring Module<br/>Live service health & metrics]
+        S[Services Module<br/>Service inventory & endpoints]
+        R[Reports Module<br/>Exportable reports]
+        P[Predictions Module<br/>Forecasting & root-cause insights]
+        RC[Recovery Module<br/>Self-healing workflows]
+        N[Notifications Module<br/>In-app alerts & messages]
+    end
+
+    subgraph Agents[Multi-Agent Intelligence Layer]
+        G1[Resource Monitoring Agent]
+        G2[Response Time Agent]
+        G3[SLA Verification Agent]
+        G4[Alert Agent]
+        G5[Recommendation Agent]
+        G6[Report Agent]
+        G7[Prediction Agent]
+        G8[Recovery Agent]
+        G9[Time Analysis Agent]
+    end
+
+    subgraph Data[Persistence Layer]
+        DB[(SQLite Database<br/>Services / Logs / Alerts / SLA / Users)]
+    end
+
+    API --> A1
+    API --> A2
+    API --> D
+    API --> M
+    API --> S
+    API --> R
+    API --> P
+    API --> RC
+    API --> N
+
+    D --> DB
+    M --> DB
+    S --> DB
+    R --> DB
+    P --> DB
+    RC --> DB
+    N --> DB
+
+    A1 --> DB
+    A2 --> DB
+
+    G1 --> DB
+    G2 --> DB
+    G3 --> DB
+    G4 --> DB
+    G5 --> DB
+    G6 --> DB
+    G7 --> DB
+    G8 --> DB
+    G9 --> DB
+
+    G1 --> M
+    G2 --> M
+    G3 --> M
+    G4 --> N
+    G5 --> R
+    G6 --> R
+    G7 --> P
+    G8 --> RC
+    G9 --> D
+
+    API --> G1
+    API --> G2
+    API --> G3
+    API --> G4
+    API --> G5
+    API --> G6
+    API --> G7
+    API --> G8
+    API --> G9
+
+    classDef user fill:#1e293b,stroke:#94a3b8,color:#f8fafc,stroke-width:1px;
+    classDef frontend fill:#4f46e5,stroke:#818cf8,color:#f8fafc,stroke-width:1px;
+    classDef backend fill:#0f766e,stroke:#2dd4bf,color:#f8fafc,stroke-width:1px;
+    classDef module fill:#2563eb,stroke:#60a5fa,color:#f8fafc,stroke-width:1px;
+    classDef agent fill:#7c3aed,stroke:#a78bfa,color:#f8fafc,stroke-width:1px;
+    classDef data fill:#b45309,stroke:#f59e0b,color:#f8fafc,stroke-width:1px;
+
+    class U user;
+    class B,F frontend;
+    class API,A1,A2 backend;
+    class D,M,S,R,P,RC,N module;
+    class G1,G2,G3,G4,G5,G6,G7,G8,G9 agent;
+    class DB data;

@@ -1,0 +1,45 @@
+flowchart LR
+    O[Agent Orchestrator] --> RM[Resource Monitoring Agent]
+    O --> RTA[Response Time Analysis Agent]
+    O --> SLA[SLA Verification Agent]
+    O --> A[Alert Agent]
+    O --> REC[Recommendation Agent]
+    O --> REP[Report Generation Agent]
+    O --> TA[Time Analysis Agent]
+
+    RM --> DB[(SQLite Database)]
+    RTA --> DB
+    SLA --> DB
+    A --> DB
+    REC --> DB
+    REP --> DB
+    TA --> DB
+
+    DB --> SLA
+    DB --> A
+    DB --> REC
+    DB --> REP
+    DB --> TA
+
+    RM -. writes PerformanceLog .-> DB
+    RTA -. writes ApiLog .-> DB
+    SLA -. writes SlaViolation .-> DB
+    A -. writes Alert + Notification .-> DB
+    REC -. reads service metrics .-> DB
+    REP -. reads logs + alerts .-> DB
+    TA -. reads historical logs .-> DB
+
+    A --> REC
+    SLA --> A
+    DB --> A
+    DB --> REC
+    DB --> REP
+    DB --> TA
+
+    classDef orchestrator fill:#1d4ed8,stroke:#93c5fd,color:#f8fafc,stroke-width:1.2px;
+    classDef agent fill:#7c3aed,stroke:#c4b5fd,color:#f8fafc,stroke-width:1.2px;
+    classDef data fill:#b45309,stroke:#f59e0b,color:#f8fafc,stroke-width:1.2px;
+
+    class O orchestrator;
+    class RM,RTA,SLA,A,REC,REP,TA agent;
+    class DB data;

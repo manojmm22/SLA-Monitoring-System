@@ -1,0 +1,65 @@
+sequenceDiagram
+    autonumber
+    participant User
+    participant Browser
+    participant Flask
+    participant Auth as Authentication Module
+    participant Monitoring as Monitoring Module
+    participant Sla as SLA Agent
+    participant Alert as Alert Agent
+    participant SQLite
+    participant Report as Report Module
+
+    User->>Browser: Enter credentials
+    Browser->>Flask: POST /api/auth/login
+    Flask->>Auth: validate credentials
+    Auth->>SQLite: SELECT user by username/email
+    SQLite-->>Auth: user record
+    Auth->>SQLite: UPDATE last_login
+    SQLite-->>Auth: commit success
+    Auth-->>Flask: access/refresh tokens
+    Flask-->>Browser: 200 OK + JWT
+    Browser-->>User: Show authenticated dashboard
+
+    User->>Browser: Open monitoring view
+    Browser->>Flask: GET /api/monitoring/live with JWT
+    Flask->>Auth: validate JWT
+    Auth-->>Flask: user identity verified
+    Flask->>Monitoring: live_monitoring()
+    Monitoring->>SQLite: SELECT active services
+    SQLite-->>Monitoring: service list
+    Monitoring->>SQLite: SELECT latest API and performance logs
+    SQLite-->>Monitoring: log payloads
+    Monitoring-->>Flask: paginated monitoring data
+    Flask-->>Browser: 200 OK + metrics
+    Browser-->>User: Render monitoring dashboard
+
+    Note over Flask,Sla: Background monitoring loop
+    Flask->>Sla: run SLA evaluation
+    Sla->>SQLite: read SLA rules and recent logs
+    SQLite-->>Sla: metric history
+    Sla->>SQLite: INSERT SLA violation when threshold is exceeded
+    SQLite-->>Sla: commit success
+
+    Flask->>Alert: evaluate alert rules
+    Alert->>SQLite: read alert rules and recent metrics
+    SQLite-->>Alert: metric values
+    Alert->>SQLite: INSERT alert and notification records
+    SQLite-->>Alert: commit success
+
+    User->>Browser: Request a report
+    Browser->>Flask: POST /api/reports/ with report parameters
+    Flask->>Auth: validate JWT
+    Auth-->>Flask: user identity verified
+    Flask->>Report: create_report()
+    Report->>SQLite: INSERT report record
+    SQLite-->>Report: report id
+    Report->>Flask: generation started
+    Flask-->>Browser: 201 Created
+    Browser-->>User: Report queued
+
+    Report->>SQLite: read services, logs, performance, alerts for selected period
+    SQLite-->>Report: report data
+    Report->>Report: generate PDF/CSV/Excel/JSON file
+    Report->>SQLite: UPDATE report status and file path
+    SQLite-->>Report: save complete

@@ -1,0 +1,49 @@
+flowchart TB
+    subgraph Frontend[Frontend Layer]
+        direction TB
+        HTML[HTML]
+        CSS[CSS]
+        Bootstrap[Bootstrap]
+        JS[JavaScript]
+    end
+
+    subgraph Backend[Backend Layer]
+        direction TB
+        Python[Python]
+        Flask[Flask]
+    end
+
+    subgraph Database[Database Layer]
+        SQLite[(SQLite)]
+    end
+
+    subgraph Development[Development Layer]
+        direction TB
+        VSCode[VS Code]
+        Git[Git]
+        GitHub[GitHub]
+    end
+
+    subgraph Communication[Communication Layer]
+        REST[REST API]
+    end
+
+    HTML --> CSS
+    CSS --> Bootstrap
+    Bootstrap --> JS
+
+    JS --> Flask
+    Python --> Flask
+    Flask --> SQLite
+
+    VSCode --> Git
+    Git --> GitHub
+
+    JS --> REST
+    Flask --> REST
+
+    classDef layer fill:#0f172a,stroke:#38bdf8,color:#fff,stroke-width:1.5px;
+    classDef tech fill:#111827,stroke:#60a5fa,color:#fff,stroke-width:1px;
+
+    class Frontend,Backend,Database,Development,Communication layer;
+    class HTML,CSS,Bootstrap,JS,Python,Flask,SQLite,VSCode,Git,GitHub,REST tech;

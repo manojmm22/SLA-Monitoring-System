@@ -1,0 +1,16 @@
+flowchart TD
+    A([Start]) --> B[Login]
+    B --> C[Authentication]
+    C --> D[Dashboard]
+    D --> E[Monitoring]
+    E --> F[SLA Verification]
+    F --> G{Violation?}
+
+    G -- Yes --> H[Alert]
+    H --> I[Recommendation]
+    I --> J[Report]
+    J --> K[Database]
+    K --> L[Logout]
+    L --> M([End])
+
+    G -- No --> E

@@ -1,0 +1,96 @@
+erDiagram
+    USER ||--o{ ALERT : creates
+    USER ||--o{ REPORT : requests
+    SERVICE ||--o{ ALERT : triggers
+    SERVICE ||--o{ API_LOG : records
+    SERVICE ||--o{ PERFORMANCE_LOG : records
+    SERVICE ||--o{ SLA_RULE : defines
+    SERVICE ||--o{ SLA_VIOLATION : violates
+    SLA_RULE ||--o{ SLA_VIOLATION : generates
+
+    USER {
+        int id PK
+        string username
+        string email
+        string password_hash
+        bool is_active
+        datetime created_at
+    }
+
+    SERVICE {
+        int id PK
+        string name
+        string base_url
+        string status
+        bool is_active
+        int response_time_threshold
+        float cpu_threshold
+        float ram_threshold
+        float disk_threshold
+        float availability_threshold
+    }
+
+    SLA_RULE {
+        int id PK
+        int service_id FK
+        string name
+        string metric_type
+        float target_value
+        string timeframe
+        bool is_active
+    }
+
+    SLA_VIOLATION {
+        int id PK
+        int service_id FK
+        int rule_id FK
+        datetime timestamp
+        string metric_type
+        float actual_value
+        float target_value
+        float deviation_percentage
+        string severity
+    }
+
+    API_LOG {
+        int id PK
+        int service_id FK
+        int endpoint_id FK
+        datetime timestamp
+        string method
+        int status_code
+        float response_time
+        bool is_success
+    }
+
+    PERFORMANCE_LOG {
+        int id PK
+        int service_id FK
+        datetime timestamp
+        float cpu_usage
+        float ram_usage
+        float disk_usage
+    }
+
+    ALERT {
+        int id PK
+        int service_id FK
+        int user_id FK
+        int rule_id FK
+        string title
+        string severity
+        string status
+        string metric_name
+        float metric_value
+        float threshold_value
+    }
+
+    REPORT {
+        int id PK
+        int user_id FK
+        string name
+        string report_type
+        string format
+        string status
+        string file_path
+    }
