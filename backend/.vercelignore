@@ -1,0 +1,12 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.log
+tests/
+test_*.py
+tmp_*.py
+rename_service.py
+verify_login.py
+run_agents.py

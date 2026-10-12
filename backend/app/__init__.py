@@ -17,7 +17,12 @@ def create_app(config_name='default'):
     from app.utils.database import init_db
     init_db(app)
 
-    CORS(app, resources={r"/api/*": {"origins": app.config['CORS_ORIGINS']}})
+    cors_origins = app.config.get('CORS_ORIGINS', ['*'])
+    if cors_origins == ['*'] or cors_origins == '*':
+        CORS(app, resources={r"/api/*": {"origins": "*"}})
+    else:
+        CORS(app, resources={r"/api/*": {"origins": cors_origins}})
+
     jwt.init_app(app)
     limiter.init_app(app)
 
@@ -49,16 +54,40 @@ def create_app(config_name='default'):
     app.register_blueprint(predictions_bp, url_prefix='/api/predictions')
     app.register_blueprint(recovery_bp, url_prefix='/api/recovery')
 
-    should_start_agents = os.environ.get('WERKZEUG_RUN_MAIN') == 'true' or not app.debug
+    @app.route('/')
+    def root():
+        return {
+            'status': 'healthy',
+            'message': 'SLA Monitoring System API is running',
+            'version': '1.0.0'
+        }
+
+    @app.route('/api')
+    @app.route('/api/health')
+    def health_check():
+        return {
+            'status': 'healthy',
+            'message': 'SLA Monitoring System API is healthy'
+        }
+
+    is_serverless = bool(os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNCTION_NAME'))
+    should_start_agents = (
+        (os.environ.get('WERKZEUG_RUN_MAIN') == 'true' or not app.debug)
+        and not is_serverless
+        and os.environ.get('DISABLE_AGENTS', 'false').lower() != 'true'
+    )
     if should_start_agents:
-        with app.app_context():
-            from app.agents.agent_orchestrator import AgentOrchestrator
-            if not getattr(app, 'orchestrator', None):
-                orchestrator = AgentOrchestrator(app)
-                orchestrator.start()
-                app.orchestrator = orchestrator
-            elif not getattr(app.orchestrator, 'is_running', False):
-                app.orchestrator.start()
+        try:
+            with app.app_context():
+                from app.agents.agent_orchestrator import AgentOrchestrator
+                if not getattr(app, 'orchestrator', None):
+                    orchestrator = AgentOrchestrator(app)
+                    orchestrator.start()
+                    app.orchestrator = orchestrator
+                elif not getattr(app.orchestrator, 'is_running', False):
+                    app.orchestrator.start()
+        except Exception as e:
+            app.logger.warning(f"Could not start agent orchestrator: {e}")
 
     @app.errorhandler(404)
     def not_found(error):

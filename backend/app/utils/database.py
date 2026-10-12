@@ -18,12 +18,22 @@ def init_db(app):
 
     # Ensure reports directory exists
     reports_dir = app.config.get('REPORTS_DIR', 'reports')
-    os.makedirs(reports_dir, exist_ok=True)
+    try:
+        os.makedirs(reports_dir, exist_ok=True)
+    except OSError:
+        pass
 
     with app.app_context():
         import app.models  # noqa: F401 – register models before create_all
-        db.create_all()
-        seed_default_data()
+        try:
+            db.create_all()
+            seed_default_data()
+        except Exception as e:
+            app.logger.warning(f"Database init or seed error: {e}")
+            try:
+                db.session.rollback()
+            except Exception:
+                pass
 
 
 def seed_default_data():

@@ -19,16 +19,21 @@ class Config:
     ENV = FLASK_ENV
 
     # ── Database ────────────────────────────────────────────────────
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        'DATABASE_URL',
-        'sqlite:///sla_monitoring.db'
-    )
+    _raw_db = os.environ.get('DATABASE_URL')
+    if _raw_db:
+        if _raw_db.startswith('postgres://'):
+            _raw_db = _raw_db.replace('postgres://', 'postgresql://', 1)
+        SQLALCHEMY_DATABASE_URI = _raw_db
+    elif os.environ.get('VERCEL'):
+        SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/sla_monitoring.db'
+    else:
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///sla_monitoring.db'
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # SQLite does not support connection pooling options; apply them
     # only when using MySQL / PostgreSQL.
-    _db_uri = os.environ.get('DATABASE_URL', 'sqlite:///sla_monitoring.db')
-    if _db_uri and _db_uri.startswith('sqlite'):
+    if SQLALCHEMY_DATABASE_URI.startswith('sqlite'):
         SQLALCHEMY_ENGINE_OPTIONS = {}
     else:
         SQLALCHEMY_ENGINE_OPTIONS = {
@@ -54,15 +59,19 @@ class Config:
     REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
 
     # ── CORS ────────────────────────────────────────────────────────
-    CORS_ORIGINS = [
-        origin.strip()
-        for origin in os.environ.get(
-            'CORS_ORIGINS',
-            'http://localhost:5173,http://localhost:5174,'
-            'http://127.0.0.1:5173,http://127.0.0.1:5174'
-        ).split(',')
-        if origin.strip()
-    ]
+    _raw_cors = os.environ.get('CORS_ORIGINS')
+    if _raw_cors:
+        if _raw_cors.strip() == '*':
+            CORS_ORIGINS = ['*']
+        else:
+            CORS_ORIGINS = [origin.strip() for origin in _raw_cors.split(',') if origin.strip()]
+    elif os.environ.get('VERCEL'):
+        CORS_ORIGINS = ['*']
+    else:
+        CORS_ORIGINS = [
+            'http://localhost:5173', 'http://localhost:5174',
+            'http://127.0.0.1:5173', 'http://127.0.0.1:5174'
+        ]
 
     # ── Monitoring Defaults ─────────────────────────────────────────
     DEFAULT_POLLING_INTERVAL = int(os.environ.get('DEFAULT_POLLING_INTERVAL', 30))
@@ -80,9 +89,12 @@ class Config:
     SIMULATE_EMAIL = os.environ.get('SIMULATE_EMAIL', 'true').lower() == 'true'
 
     # ── Reports ─────────────────────────────────────────────────────
-    REPORTS_DIR = os.environ.get('REPORTS_DIR', os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), 'reports'
-    ))
+    if os.environ.get('VERCEL'):
+        REPORTS_DIR = os.environ.get('REPORTS_DIR', '/tmp/reports')
+    else:
+        REPORTS_DIR = os.environ.get('REPORTS_DIR', os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), 'reports'
+        ))
 
     # ── Rate Limiting ───────────────────────────────────────────────
     RATE_LIMIT_DEFAULT = "100 per minute"
