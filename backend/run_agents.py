@@ -3,12 +3,12 @@ if __name__ == '__main__':
     from app import create_app
     from app.agents.agent_orchestrator import AgentOrchestrator
 
-    app = create_app('development')
-    orchestrator = AgentOrchestrator(app)
+    flask_app = create_app('development')
+    orchestrator = AgentOrchestrator(flask_app)
     orchestrator.start()
     time.sleep(5)
 
-    with app.app_context():
+    with flask_app.app_context():
         print('response_tracker', orchestrator.run_agent('response_tracker'))
         print('resource_monitor', orchestrator.run_agent('resource_monitor'))
         print('time_analyzer', orchestrator.run_agent('time_analyzer'))

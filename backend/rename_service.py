@@ -3,8 +3,8 @@ if __name__ == '__main__':
     from app.utils.database import db
     from app.models.service import Service
 
-    app = create_app('development')
-    with app.app_context():
+    flask_app = create_app('development')
+    with flask_app.app_context():
         svc = Service.query.filter_by(name='Payments API').first()
         if svc:
             svc.name = 'SLA Gateway'
